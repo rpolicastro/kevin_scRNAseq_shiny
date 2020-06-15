@@ -21,6 +21,9 @@ Imports:
     dbplyr,
     dplyr,
     magrittr,
-    RSQLite
+    RSQLite,
+    pool,
+    stringr,
+    ggplot2
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
