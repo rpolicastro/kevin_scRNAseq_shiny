@@ -27,6 +27,17 @@ tabPanel("Markers", tabsetPanel(
     mainPanel(width = 10, DT::dataTableOutput("markerTableOutput"))
   ))
 
+)),
+
+## Expression page.
+tabPanel("Expression", tabsetPanel(
+
+  ## Expression dim plot tab.
+  tabPanel("Dim Plot", sidebarLayout(
+    expDimPlotInput("expDimPlotInput"),
+    mainPanel(width = 10, plotOutput("expDimPlotOutput"))
+  ))
+
 ))
 
 ))

@@ -29,4 +29,8 @@ function(input, output) {
     )
   )
 
+  ## Expression dim plot output.
+  exp_dimplot <- callModule(expDimPlot, "expDimPlotInput")
+  output$expDimPlotOutput <- renderPlot({exp_dimplot()}, height = 750)
+
 }

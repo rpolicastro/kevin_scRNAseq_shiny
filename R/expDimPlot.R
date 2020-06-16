@@ -1,33 +1,26 @@
 
-#' Meta-Data Plot Input UI
+#' Expression Dim Plot UI
 #'
-#' @param id Input id for use in server functions.
-#' @param ident Sample identity column name.
-#' @param clusters Cluster column name.
-#' @param nCount SCT UMI counts column name.
-#' @param nFeature SCT feature counts column name.
-#' @param percentMT Cell mitochondrial percentage column name.
+#' @inheritParams metadataPlotInput
 #'
 #' @export
 
-metadataPlotInput <- function(
+expDimPlotInput <- function(
   id,
   ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
+  clusters = "seurat_clusters"
 ) {
 
-  ## Namespace function using ID.
+  ## Namespace.
   ns <- NS(id)
 
-  ## Get sample choices.
+  ## Get sample names.
   sample_choices <- con %>%
     tbl("metadata") %>%
     distinct_at(ident) %>%
     pull(ident)
 
+  ## Get cluster names.
   cluster_choices <- con %>%
     tbl("metadata") %>%
     distinct_at(clusters) %>%
@@ -51,15 +44,18 @@ metadataPlotInput <- function(
         `actions-box` = TRUE,
         `selected-text-format` = "count > 1")
     ),
-    selectInput(
-      inputId = ns("colorby"), label = "Color By",
-      choices = c("none", ident, clusters, nCount, nFeature, percentMT),
-      selected = clusters
+    searchInput(
+      inputId = ns("gene"), label = "Gene", value = "tdTomato",
+      btnSearch = icon("search"), btnReset = icon("remove")
     ),
     selectInput(
       inputId = ns("splitby"), label = "Split By",
       choices = c("none", ident, clusters),
       selected = "none"
+    ),
+    selectInput(
+      inputId = ns("palette"), label = "Color Palette",
+      choices = c("darkblue"), selected = "darkblue"
     ),
     numericInput(
       inputId = ns("ncol"), label = "Number of Columns",
@@ -77,57 +73,55 @@ metadataPlotInput <- function(
 
 }
 
-#' Meta_data Plot Input Server
+#' Expression Dim Plot Server
 #'
-#' @param input input
-#' @param output output
-#' @param session session
-#' @inheritParams metadataPlotInput
+#' @inheritParams metadataPlot
 #'
 #' @export
 
-metadataPlot <- function(
+expDimPlot <- function(
   input, output, session,
   ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
+  clusters = "seurat_clusters"
 ) {
 
-  ## Make the meta-data dim plot.
-  dim_plot <- reactive({
+  exp_plot <- reactive({
 
-    # Grab meta-data from database.
+    ## Get meta-data.
     metadata <- con %>%
       tbl("metadata") %>%
       filter_at(ident, all_vars(. %in% !!input$sample)) %>%
       filter_at(clusters, all_vars(. %in% !!input$cluster)) %>%
-      select_at(c("cell_id", ident, clusters, nCount, nFeature, percentMT)) %>%
+      select_at(c("cell_id", ident, clusters)) %>%
       collect()
 
     setDT(metadata, key = "cell_id")
 
-    # Get the UMAP dimension.
+    ## Get UMAP coordinates.
     umap <- con %>%
       tbl("reductions") %>%
-      filter(cell_id %in% !!metadata[["cell_id"]]) %>%
+      filter_at("cell_id", all_vars(. %in% !!metadata[["cell_id"]])) %>%
       collect()
 
-    setDT(metadata, key = "cell_id")
+    setDT(umap, key = "cell_id")
 
-    # Add the UMAP dimensions to the meta-data.
-    metadata <- merge(metadata, umap)
+    ## Get expression data.
+    counts <- con %>%
+      tbl("counts") %>%
+      filter(gene == !!input$gene) %>%
+      collect()
 
-    p <- ggplot(metadata, aes(x = UMAP_1, y = UMAP_2))
+    setDT(counts, key = "cell_id")
+    counts <- counts[cell_id %in% metadata[["cell_id"]]]
+    counts[, log2_exp := log2(exp + 1)]
 
-    if (input$colorby != "none")  {
-      p <- p + geom_point(aes_string(color = input$colorby), size = input$ptsize)
-    } else {
-      p <- p + geom_point(size = input$ptsize)
-    }
+    ## Merge all of the data together.
+    counts <- merge(metadata, counts)
+    counts <- merge(counts, umap)
 
-    p <- p +
+    ## Make plot.
+    p <- ggplot(counts, aes(x = UMAP_1, y = UMAP_2)) +
+      geom_point(aes(color = log2_exp), size = input$ptsize) +
       theme_minimal() +
       theme(text = element_text(size = input$fontsize))
 
@@ -135,13 +129,17 @@ metadataPlot <- function(
       p <- p + facet_wrap(
         as.formula(str_c("~", input$splitby)),
         ncol = input$ncol
-      ) 
-    }   
-    
+      )
+    }
+
+    if (input$palette == "darkblue") {
+      p <- p + scale_color_gradient(low = "#e6e6e6", high = "darkblue")
+    }
+
     return(p)
 
   })
-  
-  return(dim_plot)
+
+  return(exp_plot)
 
 }

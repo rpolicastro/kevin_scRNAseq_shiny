@@ -18,27 +18,34 @@ metadataTableInput <- function(
   ns <- NS(id)
 
   ## Get clusters.
-  clusters <- con %>%
+  cluster_choices <- con %>%
     tbl("metadata") %>%
     distinct_at(clusters) %>%
     pull(clusters)
 
   ## Get samples.
-  samples <- con %>%
+  sample_choices <- con %>%
     tbl("metadata") %>%
     distinct_at(ident) %>%
     pull(ident)
 
   ## Sidebar panel of inputs.
   sidebarPanel(width = 2,
-    checkboxGroupInput(
-      inputId = ns("sample"), label = "Sample",
-      choices = samples, selected = samples
+    pickerInput(
+      inputId = ns("sample"), label = "Samples",
+      choices = sample_choices, selected = sample_choices,
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1")
     ),
-    selectInput(
+    pickerInput(
       inputId = ns("cluster"), label = "Clusters",
-      choices = clusters, selected = clusters,
-      multiple = TRUE
+      choices = cluster_choices, selected = cluster_choices,
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1")
     )
   )
 
