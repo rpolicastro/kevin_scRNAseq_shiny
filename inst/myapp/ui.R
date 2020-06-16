@@ -16,6 +16,17 @@ tabPanel("Meta-Data", tabsetPanel(
     mainPanel(width = 10, DT::dataTableOutput("metadataTableOutput"))
   ))
 
+)),
+
+## Marker page.
+tabPanel("Markers", tabsetPanel(
+
+  ## Marker table tab.
+  tabPanel("Table", sidebarLayout(
+    markerTableInput("markerTableInput"),
+    mainPanel(width = 10, DT::dataTableOutput("markerTableOutput"))
+  ))
+
 ))
 
 ))

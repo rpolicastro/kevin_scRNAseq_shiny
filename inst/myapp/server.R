@@ -17,4 +17,16 @@ function(input, output) {
     )
   )
 
+  ## Marker table output.
+  marker_table <- callModule(markerTable, "markerTableInput")
+  output$markerTableOutput <- DT::renderDataTable(
+    {marker_table()},
+    extensions = "Buttons",
+    options = list(
+      order = list(list(1, "asc"), list(7, "desc")),
+      dom = "Bfrtpli",
+      buttons = c('copy', 'csv', 'excel', 'print')
+    )
+  )
+
 }
