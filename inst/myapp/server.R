@@ -29,8 +29,28 @@ function(input, output) {
     )
   )
 
+  ## Marker dot-plot output.
+  marker_dotplot <- callModule(markerDotplot, "markerDotplotInput")
+  output$markerDotplotOutput <- renderPlot({marker_dotplot()}, height = 750)
+
   ## Expression dim plot output.
   exp_dimplot <- callModule(expDimPlot, "expDimPlotInput")
   output$expDimPlotOutput <- renderPlot({exp_dimplot()}, height = 750)
+
+  ## Expression plot output.
+  exp_plot <- callModule(expPlot, "expPlotInput")
+  output$expPlotOutput <- renderPlot({exp_plot()}, height = 750)
+
+  ## Expression table output.
+  exp_table <- callModule(expTable, "expTableInput")
+  output$expTableOutput <- DT::renderDataTable(
+    {exp_table()},
+    extensions = "Buttons",
+    options = list(
+      order = list(list(2, "desc")),
+      dom = "Bfrtpli",
+      buttons = c('copy', 'csv', 'excel', 'print')
+    )
+  )
 
 }

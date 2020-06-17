@@ -61,9 +61,12 @@ metadataPlotInput <- function(
       choices = c("none", ident, clusters),
       selected = "none"
     ),
-    numericInput(
-      inputId = ns("ncol"), label = "Number of Columns",
-      value = 2, min = 1, max = 25, step = 1
+    conditionalPanel(
+      condition = "input.splitby != 'none'", ns = ns,
+      numericInput(
+        inputId = ns("ncol"), label = "Number of Columns",
+        value = 2, min = 1, max = 25, step = 1
+      )
     ),
     sliderInput(
       inputId = ns("ptsize"), label = "Point Size",

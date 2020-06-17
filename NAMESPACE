@@ -2,6 +2,12 @@
 
 export(expDimPlot)
 export(expDimPlotInput)
+export(expPlot)
+export(expPlotInput)
+export(expTable)
+export(expTableInput)
+export(markerDotplot)
+export(markerDotplotInput)
 export(markerTable)
 export(markerTableInput)
 export(metadataPlot)
