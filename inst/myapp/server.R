@@ -53,4 +53,17 @@ function(input, output) {
     )
   )
 
+  ## Term enrichment table output.
+  enrich_table <- callModule(enrichTable, "enrichTableInput")
+  output$enrichTableOutput <- DT::renderDataTable(
+    {enrich_table()},
+    extensions = "Buttons",
+    options = list(
+      order = list(list(2, "desc"), list(9, "asc")),
+      dom = "Bfrtpli",
+      buttons = c('copy', 'csv', 'excel', 'print')
+    )
+  )
+
+
 }

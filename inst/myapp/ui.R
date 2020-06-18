@@ -56,6 +56,17 @@ tabPanel("Expression", tabsetPanel(
     mainPanel(width = 10, DT::dataTableOutput("expTableOutput"))
   ))
 
+)),
+
+## Term Enrichment Page.
+tabPanel("Enrichment", tabsetPanel(
+
+  ## Table tab.
+  tabPanel("Table", sidebarLayout(
+    enrichTableInput("enrichTableInput"),
+    mainPanel(width = 10, DT::dataTableOutput("enrichTableOutput"))
+  ))
+
 ))
 
 ))
