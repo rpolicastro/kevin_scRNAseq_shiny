@@ -1,6 +1,7 @@
 
 #' @import data.table
 #' @import shiny
+#' @import shinythemes
 #' @import pool
 #' @import dplyr
 #' @import stringr

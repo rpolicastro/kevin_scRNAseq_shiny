@@ -65,5 +65,8 @@ function(input, output) {
     )
   )
 
+  ## Term enrichment dotplot.
+  enrich_dotplot <- callModule(enrichDotplot, "enrichDotplotInput")
+  output$enrichDotplotOutput <- renderPlot({enrich_dotplot()}, height = 750)
 
 }

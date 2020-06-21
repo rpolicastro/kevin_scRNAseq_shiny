@@ -1,5 +1,5 @@
 
-fluidPage(navbarPage(title = "scRNA-seq",
+fluidPage(theme = shinytheme("yeti"), navbarPage(title = "scRNA-seq",
 
 ## Meta-data page.
 tabPanel("Meta-Data", tabsetPanel(
@@ -65,6 +65,12 @@ tabPanel("Enrichment", tabsetPanel(
   tabPanel("Table", sidebarLayout(
     enrichTableInput("enrichTableInput"),
     mainPanel(width = 10, DT::dataTableOutput("enrichTableOutput"))
+  )),
+
+  ## Dot-plot tab.
+  tabPanel("Dot Plot", sidebarLayout(
+    enrichDotplotInput("enrichDotplotInput"),
+    mainPanel(width = 9, plotOutput("enrichDotplotOutput"))
   ))
 
 ))
