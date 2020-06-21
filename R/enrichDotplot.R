@@ -61,12 +61,12 @@ enrichDotplotInput <- function(id) {
       value = 0.05, max = 0.05, step = 0.005
     ),
     fluidRow(
-      column(6, selectInput(
+      column(width = 6, selectInput(
         inputId = ns("ptcolor"), label = "Point Color",
         choices = c("GeneRatio", "Count", "pvalue", "p.adjust"),
         selected = "p.adjust"
       )),
-      column(6, selectInput(
+      column(width = 6, selectInput(
         inputId = ns("ptsize"), label = "Point Size",
         choices = c("GeneRatio", "Count", "pvalue", "p.adjust"),
         selected = "Count"
@@ -82,11 +82,11 @@ enrichDotplotInput <- function(id) {
       min = 1, max = 36, value = 18, step = 1
     ),
     fluidRow(
-      column(6, textInput(
+      column(width = 6, textInput(
         inputId = ns("lowcolor"), label = "Low Color",
         value = "darkblue"
       )),
-      column(6, textInput(
+      column(width = 6, textInput(
         inputId = ns("highcolor"), label = "High Color",
         value = "lightblue"
       ))

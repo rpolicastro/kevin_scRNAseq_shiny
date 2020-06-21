@@ -41,7 +41,8 @@ metadataPlotInput <- function(
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
-        `selected-text-format` = "count > 1")
+        `selected-text-format` = "count > 1"
+      )
     ),
     pickerInput(
       inputId = ns("cluster"), label = "Clusters",
