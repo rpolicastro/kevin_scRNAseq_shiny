@@ -35,6 +35,44 @@ metadataPlotInput <- function(
 
   ## Sidebar panel of inputs.
   sidebarPanel(width = 2,
+    fluidRow(
+      column(width = 2, dropdownButton(
+        selectInput(
+          inputId = ns("theme"), label = "Theme",
+          choices = c("minimal", "classic", "grey", "bw"),
+          selected = "minimal"
+        ),
+        selectInput(
+          inputId = ns("palette"), label = "Palette",
+          choices = c("default", "viridis"),
+          selected = "default"
+        ),
+        icon = icon("palette"),
+        size = "sm"
+      )),
+      column(width = 2, dropdownButton(
+        textInput(
+          inputId = ns("filename"), label = "File Name",
+          value = "metadata_dimplot.png"
+        ),
+        fluidRow(
+          column(width = 6, numericInput(
+            inputId = ns("height"), label = "Height",
+            value = 8, min = 1, max = 36, step = 0.5
+          )),
+          column(width = 6, numericInput(
+            inputId = ns("width"), label = "Width",
+            value = 12, min = 1, max = 36, step = 0.5
+          ))
+        ),
+        downloadButton(
+          outputId = "download", label = "Download"
+        ),
+        icon = icon("save"),
+        size = "sm",
+        width = "300px"
+      ))
+    ),
     pickerInput(
       inputId = ns("sample"), label = "Samples",
       choices = sample_choices, selected = sample_choices,
@@ -131,9 +169,21 @@ metadataPlot <- function(
       p <- p + geom_point(size = input$ptsize)
     }
 
-    p <- p +
-      theme_minimal() +
-      theme(text = element_text(size = input$fontsize))
+    if (input$theme == "minimal") {
+      p <- p + theme_minimal()
+    } else if (input$theme == "classic") {
+      p <- p + theme_classic()
+    } else if (input$theme == "grey") {
+      p <- p + theme_grey()
+    } else if (input$theme == "bw") {
+      p <- p + theme_bw()
+    }
+
+    p <- p + theme(text = element_text(size = input$fontsize))
+
+    if (input$palette == "viridis") {
+      p <- p + scale_color_viridis_d()
+    }
 
     if (input$splitby != "none") {
       p <- p + facet_wrap(
