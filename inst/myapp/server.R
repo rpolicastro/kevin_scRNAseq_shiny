@@ -9,21 +9,13 @@ function(input, output, session) {
 
   ## Marker table output.
   markerTableServer("markerTable")
-#  output$markerTableOutput <- DT::renderDataTable(
-#    {marker_table()},
-#    extensions = "Buttons",
-#    options = list(
-#      order = list(list(1, "asc"), list(7, "desc")),
-#      dom = "Bfrtpli",
-#      buttons = c('copy', 'csv', 'excel', 'print')
-#    )
-#  )
-#
+
 #  ## Marker dot-plot output.
 ##  marker_dotplot <- callModule(markerDotplot, "markerDotplotInput")
 ##  output$markerDotplotOutput <- renderPlot({marker_dotplot()}, height = 750)
-#
-#  ## Expression dim plot output.
+
+  ## Expression dim plot output.
+  expDimPlotServer("expDimPlot")
 #  exp_dimplot <- callModule(expDimPlot, "expDimPlotInput")
 #  output$expDimPlotOutput <- renderPlot({exp_dimplot()}, height = 750)
 #

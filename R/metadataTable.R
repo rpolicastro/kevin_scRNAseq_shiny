@@ -67,8 +67,8 @@ moduleServer(id, function(input, output, session) {
   clusts <- reactive({
     clusters <- con %>%
       tbl(str_c(input$experiment, "_metadata")) %>%
-      distinct(seurat_clusters) %>%
-      pull(seurat_clusters)
+      distinct_at(clusters) %>%
+      pull(clusters)
     return(clusters)
   })
 

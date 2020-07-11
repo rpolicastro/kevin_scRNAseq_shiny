@@ -1,11 +1,11 @@
 
 #' Expression Dim Plot UI
 #'
-#' @inheritParams metadataPlotInput
+#' @inheritParams metadataPlotUI
 #'
 #' @export
 
-expDimPlotInput <- function(
+expDimPlotUI <- function(
   id,
   ident = "orig.ident",
   clusters = "seurat_clusters"
@@ -14,18 +14,15 @@ expDimPlotInput <- function(
   ## Namespace.
   ns <- NS(id)
 
-  ## Get sample names.
-  sample_choices <- con %>%
-    tbl("metadata") %>%
-    distinct_at(ident) %>%
-    pull(ident)
+  ## Get sample choices.
+  sample_sheet <- con %>%
+    tbl("samples") %>%
+    collect
 
-  ## Get cluster names.
-  cluster_choices <- con %>%
-    tbl("metadata") %>%
-    distinct_at(clusters) %>%
-    pull(clusters)
+  experiments <- unique(sample_sheet$experiment)
+  samples <- sample_sheet$samples
 
+  sidebarLayout(
   ## Sidebar panel of inputs.
   sidebarPanel(width = 2,
     fluidRow(
@@ -43,24 +40,39 @@ expDimPlotInput <- function(
         ),
         icon = icon("palette"),
         size = "sm"
+      )),
+      column(width = 2, dropdownButton(
+        headerPanel(""),
+        textInput(
+          inputId = ns("filename"), label = "File Name",
+          value = "metadata_dimplot.png"
+        ),
+        fluidRow(
+          column(width = 6, numericInput(
+            inputId = ns("height"), label = "Height",
+            value = 8, min = 1, max = 36, step = 0.5
+          )),
+          column(width = 6, numericInput(
+            inputId = ns("width"), label = "Width",
+            value = 12, min = 1, max = 36, step = 0.5
+          ))
+        ),
+        downloadButton(
+          outputId = ns("download"), label = "Download"
+        ),
+        headerPanel(""),
+        icon = icon("save"),
+        size = "sm",
+        width = "300px"
       ))
     ),
-    pickerInput(
-      inputId = ns("sample"), label = "Samples",
-      choices = sample_choices, selected = sample_choices,
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `selected-text-format` = "count > 1")
+    selectInput(
+      inputId = ns("experiment"), label = "Experiment",
+      choices = experiments,
+      selected = experiments[1]
     ),
-    pickerInput(
-      inputId = ns("cluster"), label = "Clusters",
-      choices = cluster_choices, selected = cluster_choices,
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `selected-text-format` = "count > 1")
-    ),
+    uiOutput(ns("samples")),
+    uiOutput(ns("clusters")),
     searchInput(
       inputId = ns("gene"), label = "Gene", value = "tdTomato",
       btnSearch = icon("search"), btnReset = icon("remove")
@@ -85,6 +97,8 @@ expDimPlotInput <- function(
       inputId = ns("fontsize"), label = "Font Size",
       min = 1, max = 36, value = 18, step = 1
     )
+  ),
+  mainPanel(width = 10, plotOutput(ns("plot")))
   )
 
 }
@@ -93,49 +107,104 @@ expDimPlotInput <- function(
 #'
 #' @importFrom stringr str_starts
 #'
-#' @inheritParams metadataPlot
+#' @inheritParams metadataPlotServer
 #'
 #' @export
 
-expDimPlot <- function(
-  input, output, session,
+expDimPlotServer <- function(
+  id,
   ident = "orig.ident",
   clusters = "seurat_clusters"
 ) {
 
-  exp_plot <- reactive({
+moduleServer(id, function(input, output, session) {
 
-    ## Get meta-data.
+  ## Get sample table.
+  samps <- con %>%
+    tbl("samples") %>%
+    collect
+  samps <- as.data.table(samps)
+
+  ## Get clusters for each experiment.
+  clusts <- reactive({
+    clusters <- con %>%
+      tbl(str_c(input$experiment, "_metadata")) %>%
+      distinct_at(clusters) %>%
+      pull(clusters)
+    return(clusters)
+  })
+
+  ## Render the samples based on experiment.
+  output$samples <- renderUI({
+    ns <- session$ns
+    choices <- samps[experiment == input$experiment]$samples
+    pickerInput(
+      inputId = ns("samples"), label = "Samples",
+      choices = choices, selected = choices,
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1"
+      )
+    )
+  })
+
+  ## Render the clusters based on experiment.
+  output$clusters <- renderUI({
+    ns <- session$ns
+    pickerInput(
+      inputId = ns("clusters"), label = "Clusters",
+      choices = clusts(), selected = clusts(),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1"
+      )
+    )
+  })
+
+  ## Get the metadata.
+  md <- reactive({
     metadata <- con %>%
-      tbl("metadata") %>%
-      filter_at(ident, all_vars(. %in% !!input$sample)) %>%
-      filter_at(clusters, all_vars(. %in% !!input$cluster)) %>%
+      tbl(str_c(input$experiment, "_metadata")) %>%
+      filter_at(ident, all_vars(. %in% !!input$samples)) %>%
+      filter_at(clusters, all_vars(. %in% !!input$clusters)) %>%
       select_at(c("cell_id", ident, clusters)) %>%
       collect()
 
     setDT(metadata, key = "cell_id")
+    return(metadata)
+  })
 
-    ## Get UMAP coordinates.
+  ## Get the UMAP embeddings.
+  um <- reactive({
     umap <- con %>%
-      tbl("reductions") %>%
-      filter_at("cell_id", all_vars(. %in% !!metadata[["cell_id"]])) %>%
+      tbl(str_c(input$experiment, "_reductions")) %>%
+      filter(cell_id %in% !!md()[["cell_id"]]) %>%
       collect()
 
     setDT(umap, key = "cell_id")
+    return(umap)
+  })
 
-    ## Get expression data.
+  ## Get the gene counts.
+  cn <- reactive({
     counts <- con %>%
-      tbl("counts") %>%
+      tbl(str_c(input$experiment, "_counts")) %>%
       filter(gene == !!input$gene) %>%
       collect()
 
     setDT(counts, key = "cell_id")
-    counts <- counts[cell_id %in% metadata[["cell_id"]]]
+    counts <- counts[cell_id %in% md()[["cell_id"]]]
     counts[, log2_exp := log2(exp + 1)]
+    return(counts)
+  })
 
+  exp_plot <- reactive({
+    
     ## Merge all of the data together.
-    counts <- merge(metadata, counts)
-    counts <- merge(counts, umap)
+    counts <- merge(md(), cn())
+    counts <- merge(counts, um())
 
     ## Make plot.
     p <- ggplot(counts, aes(x = UMAP_1, y = UMAP_2)) +
@@ -170,6 +239,16 @@ expDimPlot <- function(
 
   })
 
-  return(exp_plot)
+  ## Output the plot.
+  output$plot <- renderPlot({exp_plot()}, height = 750)
 
+  ## Save the plot.
+  output$download <- downloadHandler(
+    filename = function() {input$filename},
+    content = function(file) {
+      ggsave(file, plot = exp_plot(), height = input$height, width = input$width)
+    }
+  )
+
+})
 }

@@ -4,10 +4,12 @@
 \alias{markerTableServer}
 \title{Marker Table Server}
 \usage{
-markerTableServer(id)
+markerTableServer(id, clusters = "seurat_clusters")
 }
 \arguments{
 \item{id}{Input id for use in server functions.}
+
+\item{clusters}{Cluster column name.}
 }
 \description{
 Marker Table Server

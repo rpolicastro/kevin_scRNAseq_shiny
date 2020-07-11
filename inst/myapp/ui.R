@@ -23,17 +23,14 @@ tabPanel("Markers", tabsetPanel(
 ##    mainPanel(width = 10, plotOutput("markerDotplotOutput"))
 ##  ))
 #
-))
+)),
 
-### Expression page.
-#tabPanel("Expression", tabsetPanel(
-#
-#  ## Expression dim plot tab.
-#  tabPanel("Dim Plot", sidebarLayout(
-#    expDimPlotInput("expDimPlotInput"),
-#    mainPanel(width = 10, plotOutput("expDimPlotOutput"))
-#  )),
-#
+## Expression page.
+tabPanel("Expression", tabsetPanel(
+
+  ## Expression dim plot tab.
+  tabPanel("Dim Plot", expDimPlotUI("expDimPlot"))
+
 #  ## Expession violin plot page.
 #  tabPanel("Expression Plot", sidebarLayout(
 #    expPlotInput("expPlotInput"),
@@ -46,8 +43,8 @@ tabPanel("Markers", tabsetPanel(
 #    mainPanel(width = 10, DT::dataTableOutput("expTableOutput"))
 #  ))
 #
-#)),
-#
+))
+
 ### Term Enrichment Page.
 #tabPanel("Enrichment", tabsetPanel(
 #
