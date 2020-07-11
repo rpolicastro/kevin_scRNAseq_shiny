@@ -12,17 +12,6 @@ expDimPlot(
   clusters = "seurat_clusters"
 )
 }
-\arguments{
-\item{input}{input}
-
-\item{output}{output}
-
-\item{session}{session}
-
-\item{ident}{Sample identity column name.}
-
-\item{clusters}{Cluster column name.}
-}
 \description{
 Expression Dim Plot Server
 }

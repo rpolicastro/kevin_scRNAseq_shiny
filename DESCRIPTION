@@ -28,4 +28,4 @@ Imports:
     shinyWidgets,
     forcats
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

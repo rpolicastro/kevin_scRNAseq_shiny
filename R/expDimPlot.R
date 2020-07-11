@@ -28,6 +28,23 @@ expDimPlotInput <- function(
 
   ## Sidebar panel of inputs.
   sidebarPanel(width = 2,
+    fluidRow(
+      column(width = 2, dropdownButton(
+        headerPanel(""),
+        selectInput(
+          inputId = ns("theme"), label = "Theme",
+          choices = c("minimal", "classic", "grey", "bw"),
+          selected = "minimal"
+        ),
+        selectInput(
+          inputId = ns("palette"), label = "Palette",
+          choices = c("darkblue", "darkred", "darkgreen", "viridis"),
+          selected = "darkblue"
+        ),
+        icon = icon("palette"),
+        size = "sm"
+      ))
+    ),
     pickerInput(
       inputId = ns("sample"), label = "Samples",
       choices = sample_choices, selected = sample_choices,
@@ -60,10 +77,6 @@ expDimPlotInput <- function(
         value = 2, min = 1, max = 25, step = 1
       )
     ),
-    selectInput(
-      inputId = ns("palette"), label = "Color Palette",
-      choices = c("darkblue"), selected = "darkblue"
-    ),
     sliderInput(
       inputId = ns("ptsize"), label = "Point Size",
       min = 0.25, max = 5, value = 0.75, step = 0.25
@@ -77,6 +90,8 @@ expDimPlotInput <- function(
 }
 
 #' Expression Dim Plot Server
+#'
+#' @importFrom stringr str_starts
 #'
 #' @inheritParams metadataPlot
 #'
@@ -124,9 +139,19 @@ expDimPlot <- function(
 
     ## Make plot.
     p <- ggplot(counts, aes(x = UMAP_1, y = UMAP_2)) +
-      geom_point(aes(color = log2_exp), size = input$ptsize) +
-      theme_minimal() +
-      theme(text = element_text(size = input$fontsize))
+      geom_point(aes(color = log2_exp), size = input$ptsize)
+
+    if (input$theme == "minimal") {
+      p <- p + theme_minimal()
+    } else if (input$theme == "classic") {
+      p <- p + theme_classic()
+    } else if (input$theme == "grey") {
+      p <- p + theme_grey()
+    } else if (input$theme == "bw") {
+      p <- p + theme_bw()
+    }
+
+    p <- p + theme(text = element_text(size = input$fontsize))
 
     if (input$splitby != "none") {
       p <- p + facet_wrap(
@@ -135,8 +160,10 @@ expDimPlot <- function(
       )
     }
 
-    if (input$palette == "darkblue") {
-      p <- p + scale_color_gradient(low = "#e6e6e6", high = "darkblue")
+    if (str_starts(input$palette, "dark")) {
+      p <- p + scale_color_gradient(low = "#e6e6e6", high = input$palette)
+    } else if (input$palette == "viridis") {
+      p <- p + scale_color_viridis_c()
     }
 
     return(p)

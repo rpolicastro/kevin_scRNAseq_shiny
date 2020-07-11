@@ -28,6 +28,47 @@ markerDotplotInput <- function(
 
   ## Marker dot-plot sidebar.
   sidebarPanel(width = 2,
+#    fluidRow(
+#      column(width = 2, dropdownButton(
+#        headerPanel(""),
+#        selectInput(
+#          inputId = ns("theme"), label = "Theme",
+#          choices = c("minimal", "classic", "grey", "bw"),
+#          selected = "minimal"
+#        ),
+#        selectInput(
+#          inputId = ns("palette"), label = "Palette",
+#          choices = c("default", "viridis"),
+#          selected = "default"
+#        ),
+#        icon = icon("palette"),
+#        size = "sm"
+#      )),
+#      column(width = 2, dropdownButton(
+#        headerPanel(""),
+#        textInput(
+#          inputId = ns("filename"), label = "File Name",
+#          value = "marker_dotplot.png"
+#        ),
+#        fluidRow(
+#          column(width = 6, numericInput(
+#            inputId = ns("height"), label = "Height",
+#            value = 8, min = 1, max = 36, step = 0.5
+#          )),
+#          column(width = 6, numericInput(
+#            inputId = ns("width"), label = "Width",
+#            value = 12, min = 1, max = 36, step = 0.5
+#          ))
+#        ),
+#        downloadButton(
+#          outputId = "download", label = "Download"
+#        ),
+#        headerPanel(""),
+#        icon = icon("save"),
+#        size = "sm",
+#        width = "300px"
+#      ))
+#    ),
     pickerInput(
       inputId = ns("sample"), label = "Samples",
       choices = sample_choices, selected = sample_choices,
@@ -116,11 +157,24 @@ markerDotplot <- function(
     ## Make the marker dot-plot.
     p <- ggplot(counts, aes_string(x = "gene", y = clusters)) +
       geom_point(aes(size = frac_exp, color = avg_log2_exp)) +
-      theme_minimal() +
       theme(
         axis.text.x = element_text(angle = 45, hjust = 1),
         text = element_text(size = input$fontsize)
       )
+
+    if (input$theme == "minimal") {
+      p <- p + theme_minimal()
+    } else if (input$theme == "classic") {
+      p <- p + theme_classic()
+    } else if (input$theme == "grey") {
+      p <- p + theme_grey()
+    } else if (input$theme == "bw") {
+      p <- p + theme_bw()
+    }
+
+    if (input$palette == "viridis") {
+      p <- p + scale_color_viridis_d()
+    }
 
     return(p)
 

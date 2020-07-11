@@ -6,13 +6,6 @@
 \usage{
 expDimPlotInput(id, ident = "orig.ident", clusters = "seurat_clusters")
 }
-\arguments{
-\item{id}{Input id for use in server functions.}
-
-\item{ident}{Sample identity column name.}
-
-\item{clusters}{Cluster column name.}
-}
 \description{
 Expression Dim Plot UI
 }

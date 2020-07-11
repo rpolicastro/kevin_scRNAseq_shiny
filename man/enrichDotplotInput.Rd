@@ -6,9 +6,6 @@
 \usage{
 enrichDotplotInput(id)
 }
-\arguments{
-\item{id}{Input id for use in server functions.}
-}
 \description{
 Enrichment Dot-Plot UI.
 }

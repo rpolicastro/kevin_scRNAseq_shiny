@@ -10,7 +10,7 @@
 #'
 #' @export
 
-metadataPlotInput <- function(
+metadataPlotUI <- function(
   id,
   ident = "orig.ident",
   clusters = "seurat_clusters",
@@ -23,20 +23,19 @@ metadataPlotInput <- function(
   ns <- NS(id)
 
   ## Get sample choices.
-  sample_choices <- con %>%
-    tbl("metadata") %>%
-    distinct_at(ident) %>%
-    pull(ident)
+  sample_sheet <- con %>%
+    tbl("samples") %>%
+    collect
 
-  cluster_choices <- con %>%
-    tbl("metadata") %>%
-    distinct_at(clusters) %>%
-    pull(clusters)
+  experiments <- unique(sample_sheet$experiment)
+  samples <- sample_sheet$samples
 
+  sidebarLayout(
   ## Sidebar panel of inputs.
   sidebarPanel(width = 2,
     fluidRow(
       column(width = 2, dropdownButton(
+        headerPanel(""),
         selectInput(
           inputId = ns("theme"), label = "Theme",
           choices = c("minimal", "classic", "grey", "bw"),
@@ -51,6 +50,7 @@ metadataPlotInput <- function(
         size = "sm"
       )),
       column(width = 2, dropdownButton(
+        headerPanel(""),
         textInput(
           inputId = ns("filename"), label = "File Name",
           value = "metadata_dimplot.png"
@@ -66,30 +66,21 @@ metadataPlotInput <- function(
           ))
         ),
         downloadButton(
-          outputId = "download", label = "Download"
+          outputId = ns("download"), label = "Download"
         ),
+        headerPanel(""),
         icon = icon("save"),
         size = "sm",
         width = "300px"
       ))
     ),
-    pickerInput(
-      inputId = ns("sample"), label = "Samples",
-      choices = sample_choices, selected = sample_choices,
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `selected-text-format` = "count > 1"
-      )
+    selectInput(
+      inputId = ns("experiment"), label = "Experiment",
+      choices = experiments,
+      selected = experiments[1]
     ),
-    pickerInput(
-      inputId = ns("cluster"), label = "Clusters",
-      choices = cluster_choices, selected = cluster_choices,
-      multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `selected-text-format` = "count > 1")
-    ),
+    uiOutput(ns("samples")),
+    uiOutput(ns("clusters")),
     selectInput(
       inputId = ns("colorby"), label = "Color By",
       choices = c("none", ident, clusters, nCount, nFeature, percentMT),
@@ -115,21 +106,21 @@ metadataPlotInput <- function(
       inputId = ns("fontsize"), label = "Font Size",
       min = 1, max = 36, value = 18, step = 1
     )
-  )
+  ),
 
+  ## Main output panel.
+  mainPanel(width = 10, plotOutput(ns("plot")))
+  )
 }
 
 #' Meta_data Plot Input Server
 #'
-#' @param input input
-#' @param output output
-#' @param session session
-#' @inheritParams metadataPlotInput
+#' @inheritParams metadataPlotUI
 #'
 #' @export
 
-metadataPlot <- function(
-  input, output, session,
+metadataPlotServer <- function(
+  id,
   ident = "orig.ident",
   clusters = "seurat_clusters",
   nCount = "nCount_SCT",
@@ -137,29 +128,82 @@ metadataPlot <- function(
   percentMT = "percent.mt"
 ) {
 
-  ## Make the meta-data dim plot.
-  dim_plot <- reactive({
+moduleServer(id, function(input, output, session) {
 
-    # Grab meta-data from database.
+  ## Get sample table.
+  samps <- con %>%
+    tbl("samples") %>%
+    collect
+  samps <- as.data.table(samps)
+
+  ## Get clusters for each experiment.
+  clusts <- reactive({
+    clusters <- con %>%
+      tbl(str_c(input$experiment, "_metadata")) %>%
+      distinct(seurat_clusters) %>%
+      pull(seurat_clusters)
+    return(clusters)
+  })
+
+  ## Render the samples based on experiment.
+  output$samples <- renderUI({
+    ns <- session$ns
+    choices <- samps[experiment == input$experiment]$samples
+    pickerInput(
+      inputId = ns("samples"), label = "Samples",
+      choices = choices, selected = choices,
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1"
+      )
+    )
+  })
+
+  ## Render the clusters based on experiment.
+  output$clusters <- renderUI({
+    ns <- session$ns
+    pickerInput(
+      inputId = ns("clusters"), label = "Clusters",
+      choices = clusts(), selected = clusts(),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1"
+      )
+    )
+  })
+
+  ## Get the metadata.
+  md <- reactive({
     metadata <- con %>%
-      tbl("metadata") %>%
-      filter_at(ident, all_vars(. %in% !!input$sample)) %>%
-      filter_at(clusters, all_vars(. %in% !!input$cluster)) %>%
+      tbl(str_c(input$experiment, "_metadata")) %>%
+      filter_at(ident, all_vars(. %in% !!input$samples)) %>%
+      filter_at(clusters, all_vars(. %in% !!input$clusters)) %>%
       select_at(c("cell_id", ident, clusters, nCount, nFeature, percentMT)) %>%
       collect()
 
     setDT(metadata, key = "cell_id")
+    return(metadata)
+  })
 
-    # Get the UMAP dimension.
+  ## Get the UMAP embeddings.
+  um <- reactive({
     umap <- con %>%
-      tbl("reductions") %>%
-      filter(cell_id %in% !!metadata[["cell_id"]]) %>%
+      tbl(str_c(input$experiment, "_reductions")) %>%
+      filter(cell_id %in% !!md()[["cell_id"]]) %>%
       collect()
 
-    setDT(metadata, key = "cell_id")
+    setDT(umap, key = "cell_id")
+    return(umap)
+  })
+
+
+  ## Make the meta-data dim plot.
+  dim_plot <- reactive({
 
     # Add the UMAP dimensions to the meta-data.
-    metadata <- merge(metadata, umap)
+    metadata <- merge(md(), um())
 
     p <- ggplot(metadata, aes(x = UMAP_1, y = UMAP_2))
 
@@ -193,9 +237,18 @@ metadataPlot <- function(
     }   
     
     return(p)
-
   })
-  
-  return(dim_plot)
 
+  ## Output the meta-data dimplot.
+  output$plot <- renderPlot({dim_plot()}, height = 750)
+
+  ## Save the plot.
+  output$download <- downloadHandler(
+    filename = function() {input$filename},
+    content = function(file) {
+      ggsave(file, plot = dim_plot(), height = input$height, width = input$width)
+    }
+  )
+  
+})
 }

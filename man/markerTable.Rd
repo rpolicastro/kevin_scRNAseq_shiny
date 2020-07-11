@@ -6,13 +6,6 @@
 \usage{
 markerTable(input, output, session)
 }
-\arguments{
-\item{input}{input}
-
-\item{output}{output}
-
-\item{session}{session}
-}
 \description{
 Marker Table Server
 }

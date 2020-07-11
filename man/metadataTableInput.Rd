@@ -13,19 +13,6 @@ metadataTableInput(
   percentMT = "percent.mt"
 )
 }
-\arguments{
-\item{id}{Input id for use in server functions.}
-
-\item{ident}{Sample identity column name.}
-
-\item{clusters}{Cluster column name.}
-
-\item{nCount}{SCT UMI counts column name.}
-
-\item{nFeature}{SCT feature counts column name.}
-
-\item{percentMT}{Cell mitochondrial percentage column name.}
-}
 \description{
 Meta-Data Table Input
 }

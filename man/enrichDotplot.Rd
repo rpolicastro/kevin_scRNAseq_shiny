@@ -6,13 +6,6 @@
 \usage{
 enrichDotplot(input, output, session)
 }
-\arguments{
-\item{input}{input}
-
-\item{output}{output}
-
-\item{session}{session}
-}
 \description{
 Enrichment Dot-Plot Server
 }
