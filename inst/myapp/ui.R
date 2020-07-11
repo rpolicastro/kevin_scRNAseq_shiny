@@ -5,13 +5,9 @@ fluidPage(theme = shinytheme("yeti"), navbarPage(title = "scRNA-seq",
 tabPanel("Meta-Data", tabsetPanel(
 
   ## Meta-data plot tab.
-  tabPanel("Dim Plot", metadataPlotUI("metadataPlot"))#,
-
-#  ## Meta-data table tab.
-#  tabPanel("Table", sidebarLayout(
-#    metadataTableInput("metadataTableInput"),
-#    mainPanel(width = 10, DT::dataTableOutput("metadataTableOutput"))
-#  ))
+  tabPanel("Dim Plot", metadataPlotUI("metadataPlot")),
+  ## Meta-data table tab.
+  tabPanel("Table", metadataTableUI("metadataTable"))
 
 ))#,
 

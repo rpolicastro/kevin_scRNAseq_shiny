@@ -3,10 +3,9 @@ function(input, output, session) {
 
   ## Meta-data plot output.
   metadataPlotServer("metadataPlot")
-#  metadata_dimplot <- callModule(metadataPlot, "metadataPlotInput")
-#  output$metadataPlotOutput <- renderPlot({metadata_dimplot()}, height = 750)
 
-#  ## Meta-data table output.
+  ## Meta-data table output.
+  metadataTableServer("metadataTable")
 #  metadata_table <- callModule(metadataTable, "metadataTableInput")
 #  output$metadataTableOutput <- DT::renderDataTable(
 #    {metadata_table()},
