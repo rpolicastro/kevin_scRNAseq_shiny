@@ -32,11 +32,10 @@ tabPanel("Expression", tabsetPanel(
   tabPanel("Dim Plot", expDimPlotUI("expDimPlot")),
 
   ## Expession violin plot page.
-  tabPanel("Expression Plot", expPlotUI("expPlot"))
-#  )),
-#
-#  ## Expression table.
-#  tabPanel("Table", sidebarLayout(
+  tabPanel("Expression Plot", expPlotUI("expPlot")),
+
+  ## Expression table.
+  tabPanel("Table", expTableUI("expTable"))
 #    expTableInput("expTableInput"),
 #    mainPanel(width = 10, DT::dataTableOutput("expTableOutput"))
 #  ))

@@ -19,10 +19,9 @@ function(input, output, session) {
 
   ## Expression plot output.
   expPlotServer("expPlot")
-#  output$expPlotOutput <- renderPlot({exp_plot()}, height = 750)
-#
-#  ## Expression table output.
-#  exp_table <- callModule(expTable, "expTableInput")
+
+  ## Expression table output.
+  expTableServer("expTable")
 #  output$expTableOutput <- DT::renderDataTable(
 #    {exp_table()},
 #    extensions = "Buttons",
