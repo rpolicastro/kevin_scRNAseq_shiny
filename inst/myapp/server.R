@@ -16,11 +16,9 @@ function(input, output, session) {
 
   ## Expression dim plot output.
   expDimPlotServer("expDimPlot")
-#  exp_dimplot <- callModule(expDimPlot, "expDimPlotInput")
-#  output$expDimPlotOutput <- renderPlot({exp_dimplot()}, height = 750)
-#
-#  ## Expression plot output.
-#  exp_plot <- callModule(expPlot, "expPlotInput")
+
+  ## Expression plot output.
+  expPlotServer("expPlot")
 #  output$expPlotOutput <- renderPlot({exp_plot()}, height = 750)
 #
 #  ## Expression table output.

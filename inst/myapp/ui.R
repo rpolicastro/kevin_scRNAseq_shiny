@@ -29,12 +29,10 @@ tabPanel("Markers", tabsetPanel(
 tabPanel("Expression", tabsetPanel(
 
   ## Expression dim plot tab.
-  tabPanel("Dim Plot", expDimPlotUI("expDimPlot"))
+  tabPanel("Dim Plot", expDimPlotUI("expDimPlot")),
 
-#  ## Expession violin plot page.
-#  tabPanel("Expression Plot", sidebarLayout(
-#    expPlotInput("expPlotInput"),
-#    mainPanel(width = 10, plotOutput("expPlotOutput"))
+  ## Expession violin plot page.
+  tabPanel("Expression Plot", expPlotUI("expPlot"))
 #  )),
 #
 #  ## Expression table.
