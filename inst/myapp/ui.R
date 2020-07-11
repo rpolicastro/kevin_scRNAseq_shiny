@@ -9,25 +9,22 @@ tabPanel("Meta-Data", tabsetPanel(
   ## Meta-data table tab.
   tabPanel("Table", metadataTableUI("metadataTable"))
 
-))#,
+)),
 
-### Marker page.
-#tabPanel("Markers", tabsetPanel(
-#
-#  ## Marker table tab.
-#  tabPanel("Table", sidebarLayout(
-#    markerTableInput("markerTableInput"),
-#    mainPanel(width = 10, DT::dataTableOutput("markerTableOutput"))
-#  ))#,
-#
+## Marker page.
+tabPanel("Markers", tabsetPanel(
+
+  ## Marker table tab.
+  tabPanel("Table", markerTableUI("markerTable"))
+
 #  ## Marker dot-plot.
 ##  tabPanel("Dot Plot", sidebarLayout(
 ##    markerDotplotInput("markerDotplotInput"),
 ##    mainPanel(width = 10, plotOutput("markerDotplotOutput"))
 ##  ))
 #
-#)),
-#
+))
+
 ### Expression page.
 #tabPanel("Expression", tabsetPanel(
 #

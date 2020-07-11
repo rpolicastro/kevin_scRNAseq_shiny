@@ -6,19 +6,9 @@ function(input, output, session) {
 
   ## Meta-data table output.
   metadataTableServer("metadataTable")
-#  metadata_table <- callModule(metadataTable, "metadataTableInput")
-#  output$metadataTableOutput <- DT::renderDataTable(
-#    {metadata_table()},
-#    extensions = "Buttons",
-#    options = list(
-#      order = list(2, "desc"),
-#      dom = "Bfrtpli",
-#      buttons = c('copy', 'csv', 'excel', 'print')
-#    )
-#  )
-#
-#  ## Marker table output.
-#  marker_table <- callModule(markerTable, "markerTableInput")
+
+  ## Marker table output.
+  markerTableServer("markerTable")
 #  output$markerTableOutput <- DT::renderDataTable(
 #    {marker_table()},
 #    extensions = "Buttons",
