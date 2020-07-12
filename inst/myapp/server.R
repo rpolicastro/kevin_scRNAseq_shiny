@@ -1,5 +1,5 @@
 
-function(input, output, session) {
+server <- function(input, output) {
 
   ## Meta-data plot output.
   metadataPlotServer("metadataPlot")
