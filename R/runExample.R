@@ -8,6 +8,7 @@
 #' @import pool
 #' @import shinyWidgets
 #' @import DBI
+#' @importFrom magrittr %>%
 #' @importFrom RSQLite SQLite
 #'
 #' @export
