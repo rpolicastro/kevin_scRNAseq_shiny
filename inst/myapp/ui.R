@@ -1,5 +1,5 @@
 
-fluidPage(theme = shinytheme("yeti"), navbarPage(title = "scRNA-seq",
+ui <- fluidPage(theme = shinytheme("yeti"), navbarPage(title = "scRNA-seq",
 
 ## Meta-data page.
 tabPanel("Meta-Data", tabsetPanel(
