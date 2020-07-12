@@ -1,7 +1,7 @@
 
 #' Marker Dot-Plot UI.
 #'
-#' @inheritParams metadataPlotInput
+#' @inheritParams metadataPlotUI
 #'
 #' @export
 
@@ -99,7 +99,7 @@ markerDotplotInput <- function(
 
 #' Marker Dot-Plot Server.
 #'
-#' @inheritParams metadataPlot
+#' @inheritParams metadataPlotServer
 #'
 #' @export
 

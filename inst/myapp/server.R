@@ -22,30 +22,11 @@ function(input, output, session) {
 
   ## Expression table output.
   expTableServer("expTable")
-#  output$expTableOutput <- DT::renderDataTable(
-#    {exp_table()},
-#    extensions = "Buttons",
-#    options = list(
-#      order = list(list(2, "desc")),
-#      dom = "Bfrtpli",
-#      buttons = c('copy', 'csv', 'excel', 'print')
-#    )
-#  )
-#
-#  ## Term enrichment table output.
-#  enrich_table <- callModule(enrichTable, "enrichTableInput")
-#  output$enrichTableOutput <- DT::renderDataTable(
-#    {enrich_table()},
-#    extensions = "Buttons",
-#    options = list(
-#      order = list(list(2, "desc"), list(9, "asc")),
-#      dom = "Bfrtpli",
-#      buttons = c('copy', 'csv', 'excel', 'print')
-#    )
-#  )
-#
-#  ## Term enrichment dotplot.
-#  enrich_dotplot <- callModule(enrichDotplot, "enrichDotplotInput")
-#  output$enrichDotplotOutput <- renderPlot({enrich_dotplot()}, height = 750)
+
+  ## Term enrichment table output.
+  enrichTableServer("enrichTable")
+
+  ## Term enrichment dotplot.
+  enrichDotplotServer("enrichDotPlot")
 
 }

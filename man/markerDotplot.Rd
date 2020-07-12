@@ -12,6 +12,11 @@ markerDotplot(
   clusters = "seurat_clusters"
 )
 }
+\arguments{
+\item{ident}{Sample identity column name.}
+
+\item{clusters}{Cluster column name.}
+}
 \description{
 Marker Dot-Plot Server.
 }

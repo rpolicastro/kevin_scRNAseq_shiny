@@ -1,14 +1,13 @@
 
+#' @import dplyr
+#' @import stringr
+#' @import ggplot2
 #' @import data.table
 #' @import shiny
 #' @import shinythemes
 #' @import pool
-#' @import dplyr
-#' @import stringr
-#' @import ggplot2
 #' @import shinyWidgets
-#' @importFrom magrittr %>%
-#' @importFrom DBI dbConnect
+#' @import DBI
 #' @importFrom RSQLite SQLite
 #'
 #' @export

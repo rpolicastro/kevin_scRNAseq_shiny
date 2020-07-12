@@ -36,27 +36,18 @@ tabPanel("Expression", tabsetPanel(
 
   ## Expression table.
   tabPanel("Table", expTableUI("expTable"))
-#    expTableInput("expTableInput"),
-#    mainPanel(width = 10, DT::dataTableOutput("expTableOutput"))
-#  ))
-#
-))
 
-### Term Enrichment Page.
-#tabPanel("Enrichment", tabsetPanel(
-#
-#  ## Table tab.
-#  tabPanel("Table", sidebarLayout(
-#    enrichTableInput("enrichTableInput"),
-#    mainPanel(width = 10, DT::dataTableOutput("enrichTableOutput"))
-#  )),
-#
-#  ## Dot-plot tab.
-#  tabPanel("Dot Plot", sidebarLayout(
-#    enrichDotplotInput("enrichDotplotInput"),
-#    mainPanel(width = 9, plotOutput("enrichDotplotOutput"))
-#  ))
-#
-#))
+)),
+
+## Term Enrichment Page.
+tabPanel("Enrichment", tabsetPanel(
+
+  ## Table tab.
+  tabPanel("Table", enrichTableUI("enrichTable")),
+
+  ## Dot-plot tab.
+  tabPanel("Dot Plot", enrichDotplotUI("enrichDotPlot"))
+
+))
 
 ))
