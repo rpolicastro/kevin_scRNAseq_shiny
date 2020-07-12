@@ -11,18 +11,12 @@ tabPanel("Meta-Data", tabsetPanel(
 
 )),
 
-## Marker page.
+# Marker page.
 tabPanel("Markers", tabsetPanel(
 
   ## Marker table tab.
   tabPanel("Table", markerTableUI("markerTable"))
 
-#  ## Marker dot-plot.
-##  tabPanel("Dot Plot", sidebarLayout(
-##    markerDotplotInput("markerDotplotInput"),
-##    mainPanel(width = 10, plotOutput("markerDotplotOutput"))
-##  ))
-#
 )),
 
 ## Expression page.

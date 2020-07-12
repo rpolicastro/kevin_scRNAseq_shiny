@@ -20,7 +20,7 @@ enrichDotplotUI <- function(
 
   sidebarLayout(
   ## Enrichment dot-plot inputs.
-  sidebarPanel(width = 2.5,
+  sidebarPanel(width = 3,
     fluidRow(
       column(width = 2, dropdownButton(
         headerPanel(""),
@@ -106,7 +106,7 @@ enrichDotplotUI <- function(
       min = 1, max = 36, value = 18, step = 1
     )
   ),
-  mainPanel(width = 9.5, plotOutput(ns("plot")))
+  mainPanel(width = 9, plotOutput(ns("plot")))
   )
 
 }
