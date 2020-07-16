@@ -19,12 +19,6 @@ metadataTableServer(
 \item{ident}{Sample identity column name.}
 
 \item{clusters}{Cluster column name.}
-
-\item{nCount}{SCT UMI counts column name.}
-
-\item{nFeature}{SCT feature counts column name.}
-
-\item{percentMT}{Cell mitochondrial percentage column name.}
 }
 \description{
 Meta-Data Table Output Server

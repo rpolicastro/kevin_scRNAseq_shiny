@@ -4,14 +4,7 @@
 \alias{metadataPlotUI}
 \title{Meta-Data Plot Input UI}
 \usage{
-metadataPlotUI(
-  id,
-  ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
-)
+metadataPlotUI(id, ident = "orig.ident", clusters = "seurat_clusters")
 }
 \arguments{
 \item{id}{Input id for use in server functions.}

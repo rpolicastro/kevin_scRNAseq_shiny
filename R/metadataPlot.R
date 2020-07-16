@@ -13,10 +13,7 @@
 metadataPlotUI <- function(
   id,
   ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
+  clusters = "seurat_clusters"
 ) {
 
   ## Namespace function using ID.
@@ -43,8 +40,12 @@ metadataPlotUI <- function(
         ),
         selectInput(
           inputId = ns("palette"), label = "Palette",
-          choices = c("default", "viridis"),
-          selected = "default"
+          choices = c("Default", "Viridis", "Blues", "Reds", "Greens"),
+          selected = "Default"
+        ),
+        checkboxInput(
+          inputId = ns("invert"), label = "Invert Colors",
+          value = FALSE
         ),
         icon = icon("palette"),
         size = "sm"
@@ -81,11 +82,7 @@ metadataPlotUI <- function(
     ),
     uiOutput(ns("samples")),
     uiOutput(ns("clusters")),
-    selectInput(
-      inputId = ns("colorby"), label = "Color By",
-      choices = c("none", ident, clusters, nCount, nFeature, percentMT),
-      selected = clusters
-    ),
+    uiOutput(ns("colorby")),
     selectInput(
       inputId = ns("splitby"), label = "Split By",
       choices = c("none", ident, clusters),
@@ -122,10 +119,7 @@ metadataPlotUI <- function(
 metadataPlotServer <- function(
   id,
   ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
+  clusters = "seurat_clusters"
 ) {
 
 moduleServer(id, function(input, output, session) {
@@ -180,12 +174,29 @@ moduleServer(id, function(input, output, session) {
       tbl(str_c(input$experiment, "_metadata")) %>%
       filter_at(ident, all_vars(. %in% !!input$samples)) %>%
       filter_at(clusters, all_vars(. %in% !!input$clusters)) %>%
-      select_at(c("cell_id", ident, clusters, nCount, nFeature, percentMT)) %>%
       collect()
 
     setDT(metadata, key = "cell_id")
     return(metadata)
   })
+
+  ## Get the column names of the metadata.
+  cols <- reactive({
+    cols <- colnames(md())
+    cols <- cols[cols != "cell_id"]
+    return(cols)
+  })
+
+  ## Render the color-by choices.
+  output$colorby <- renderUI({
+    ns <- session$ns
+    selectInput(
+      inputId = ns("colorby"), label = "Color By",
+      choices = c("none", cols()),
+      selected = clusters
+    )
+  })
+
 
   ## Get the UMAP embeddings.
   um <- reactive({
@@ -225,8 +236,17 @@ moduleServer(id, function(input, output, session) {
 
     p <- p + theme(text = element_text(size = input$fontsize))
 
-    if (input$palette == "viridis") {
-      p <- p + scale_color_viridis_d()
+    direction <- ifelse((input$invert), 1, -1)
+    if (input$palette != "Default" && is(metadata[[input$colorby]], "numeric")) {
+      if (input$palette == "Viridis") p <- p + scale_color_viridis_c(direction = direction)
+      if (input$palette %in% c("Blues", "Reds", "Greens")) {
+        p <- p + scale_color_distiller(palette = input$palette, direction = direction)
+      }
+    } else {
+      if (input$palette == "Viridis") p <- p + scale_color_viridis_d(direction = direction)
+      if (input$palette %in% c("Blues", "Reds", "Greens")) {
+        p <- p + scale_color_brewer(palette = input$palette, direction = direction)
+      }
     }
 
     if (input$splitby != "none") {

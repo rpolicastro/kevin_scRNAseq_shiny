@@ -4,14 +4,7 @@
 \alias{metadataPlotServer}
 \title{Meta_data Plot Input Server}
 \usage{
-metadataPlotServer(
-  id,
-  ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
-)
+metadataPlotServer(id, ident = "orig.ident", clusters = "seurat_clusters")
 }
 \arguments{
 \item{id}{Input id for use in server functions.}
@@ -19,12 +12,6 @@ metadataPlotServer(
 \item{ident}{Sample identity column name.}
 
 \item{clusters}{Cluster column name.}
-
-\item{nCount}{SCT UMI counts column name.}
-
-\item{nFeature}{SCT feature counts column name.}
-
-\item{percentMT}{Cell mitochondrial percentage column name.}
 }
 \description{
 Meta_data Plot Input Server
