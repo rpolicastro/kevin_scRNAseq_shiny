@@ -33,7 +33,8 @@ metadataTableUI <- function(
       selected = experiments[1]
     ),
     uiOutput(ns("samples")),
-    uiOutput(ns("clusters"))
+    uiOutput(ns("clusters")),
+    uiOutput(ns("datatypes"))
   ),
   mainPanel(width = 10, DT::dataTableOutput(ns("table")))
   )
@@ -49,10 +50,7 @@ metadataTableUI <- function(
 metadataTableServer <- function(
   id,
   ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
+  clusters = "seurat_clusters"
 ) {
 
 moduleServer(id, function(input, output, session) {
@@ -109,7 +107,6 @@ moduleServer(id, function(input, output, session) {
       tbl(str_c(input$experiment, "_metadata")) %>%
       filter_at(ident, all_vars(. %in% !!input$samples)) %>%
       filter_at(clusters, all_vars(.  %in% !!input$clusters)) %>%
-      select_at(c("cell_id", ident, clusters, nCount, nFeature, percentMT)) %>%
       collect()
 
     setDT(metadata)
@@ -118,12 +115,39 @@ moduleServer(id, function(input, output, session) {
 
   }) 
 
+  ## Get the column names of the metadata.
+  cols <- reactive({
+    cols <- colnames(metadata_table())
+    cols <- cols[cols != "cell_id"]
+    return(cols)
+  })
+
+  ## Render the column name choices.
+  output$datatypes <- renderUI({
+    ns <- session$ns
+    pickerInput(
+      inputId = ns("datatypes"), label = "Columns",
+      choices = c(cols()), selected = c(ident, clusters),
+      multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `selected-text-format` = "count > 1"
+      )
+    )
+  })
+
+  ## Return only the desired columns.
+  md <- reactive({
+    selected_cols <- c("cell_id", input$datatypes)
+    md <- metadata_table()[, ..selected_cols]
+    return(md)
+  })
+
   ## Output the table.
   output$table <- DT::renderDataTable(
-    {metadata_table()},
+    {md()},
     extensions = "Buttons",
     options = list(
-      order = list(2, "desc"),
       dom = "Bfrtpli",
       buttons = c('copy', 'csv', 'excel', 'print')
     )

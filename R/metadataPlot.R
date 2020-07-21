@@ -40,7 +40,10 @@ metadataPlotUI <- function(
         ),
         selectInput(
           inputId = ns("palette"), label = "Palette",
-          choices = c("Default", "Viridis", "Blues", "Reds", "Greens"),
+          choices = c(
+            "Default", "Viridis", "Cividis", "Blues", "Reds",
+            "Greens"
+          ),
           selected = "Default"
         ),
         checkboxInput(
@@ -239,11 +242,17 @@ moduleServer(id, function(input, output, session) {
     direction <- ifelse((input$invert), 1, -1)
     if (input$palette != "Default" && is(metadata[[input$colorby]], "numeric")) {
       if (input$palette == "Viridis") p <- p + scale_color_viridis_c(direction = direction)
+      if (input$palette == "Cividis") {
+        p <- p + scale_color_viridis_c(direction = direction, option = "cividis")
+      }
       if (input$palette %in% c("Blues", "Reds", "Greens")) {
         p <- p + scale_color_distiller(palette = input$palette, direction = direction)
       }
     } else {
       if (input$palette == "Viridis") p <- p + scale_color_viridis_d(direction = direction)
+      if (input$palette == "Cividis") {
+        p <- p + scale_color_viridis_d(direction = direction, option = "cividis")
+      }
       if (input$palette %in% c("Blues", "Reds", "Greens")) {
         p <- p + scale_color_brewer(palette = input$palette, direction = direction)
       }

@@ -4,14 +4,7 @@
 \alias{metadataTableServer}
 \title{Meta-Data Table Output Server}
 \usage{
-metadataTableServer(
-  id,
-  ident = "orig.ident",
-  clusters = "seurat_clusters",
-  nCount = "nCount_SCT",
-  nFeature = "nFeature_SCT",
-  percentMT = "percent.mt"
-)
+metadataTableServer(id, ident = "orig.ident", clusters = "seurat_clusters")
 }
 \arguments{
 \item{id}{Input id for use in server functions.}
